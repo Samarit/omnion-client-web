@@ -5,11 +5,11 @@ import { io } from "socket.io-client"
 
 export default function Chat() {
   const [connected, setConnected] = useState(false)
-  const [text, setText] = useState("")
+  const [chatHistory, setChatHistory] = useState<string[]>([])
 
   useEffect(() => {
     const socket = io("ws://localhost:5000", {
-      path: "/",
+      transports: ["websocket"],
     })
 
     socket.on("connect", () => {
@@ -18,7 +18,7 @@ export default function Chat() {
     })
 
     socket.on("message", (message: any) => {
-      setText(message)
+      setChatHistory((prev) => [...prev, message])
     })
 
     return () => {
@@ -29,7 +29,11 @@ export default function Chat() {
   return (
     <div className='chat'>
       <h3>{connected ? "connected!" : "connecting..."}</h3>
-      <span>{text}</span>
+      <ul>
+        {chatHistory.map((message, index) => (
+          <li key={index}>{message}</li>
+        ))}
+      </ul>
     </div>
   )
 }

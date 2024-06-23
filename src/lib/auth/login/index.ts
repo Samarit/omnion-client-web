@@ -3,8 +3,10 @@ import { NextResponse } from "next/server"
 
 export async function signIn(login: string, password: string) {
   console.log("login", login, "password", password)
+  console.log(JSON.stringify({ login, password }))
   const response = await fetch("http://localhost:5000/auth/login", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ login, password }),
   })
 

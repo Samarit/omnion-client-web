@@ -4,6 +4,7 @@ import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import { useEffect, useState } from "react"
 import { Socket, io } from "socket.io-client"
+import ChatBox from "./chatbox"
 
 const sendSocketMessage = (socket: Socket, message: string) => {
   if (!socket) {
@@ -85,11 +86,12 @@ export default function Chat() {
   return (
     <div className='chat'>
       <h3>{connected ? "connected!" : "connecting..."}</h3>
-      <ul>
-        {chatHistory.map((message, i) => (
-          <li key={i} style={{ border: "1px solid white" }}>
-            {message.join("")}
-          </li>
+      <ul className='flex flex-col w-full gap-2'>
+        {chatHistory.map((msg, i) => (
+          <ChatBox
+            position={i % 2 === 0 ? "left" : "right"}
+            message={msg.join("")}
+            key={i}></ChatBox>
         ))}
       </ul>
       <Input

@@ -1,5 +1,7 @@
 "use client"
 
+import { Button } from "@/shared/ui/button"
+import { Input } from "@/shared/ui/input"
 import { useEffect, useState } from "react"
 import { Socket, io } from "socket.io-client"
 
@@ -22,6 +24,7 @@ export default function Chat() {
     setSocket(
       io("ws://localhost:5000", {
         transports: ["websocket"],
+        reconnection: false,
       })
     )
   }, [])
@@ -89,19 +92,22 @@ export default function Chat() {
           </li>
         ))}
       </ul>
-      <input
+      <Input
         value={message}
         onChange={(e) => {
           setMessage(e.target.value)
         }}
+        placeholder='Enter message...'
       />
-      <button
+      <Button
+        variant={"outline"}
         onClick={() => {
-          if (!socket) return
+          if (!message || !socket) return
           sendSocketMessage(socket, message)
+          setMessage("")
         }}>
         Send
-      </button>
+      </Button>
     </div>
   )
 }

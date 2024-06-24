@@ -9,14 +9,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/shared/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/shared/ui/input"
 import { submitLogin } from "./actions"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/shared/ui/button"
 
-export const schema = z.object({
+const schema = z.object({
   login: z.string().trim().min(5, "Login must be at least 5 characters long"),
   password: z
     .string()
@@ -25,7 +25,7 @@ export const schema = z.object({
 })
 
 export default function LoginForm() {
-  const form = useForm({
+  const form = useForm<z.output<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { login: "", password: "" },
   })
@@ -48,7 +48,6 @@ export default function LoginForm() {
                 <FormControl>
                   <Input placeholder='Login...' {...field} />
                 </FormControl>
-                <FormDescription>This is login description</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -62,13 +61,14 @@ export default function LoginForm() {
                 <FormControl>
                   <Input placeholder='Password' type='password' {...field} />
                 </FormControl>
-                <FormDescription>This is password description</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <Button type='submit'>Sign In</Button>
+          <Button type='submit' variant={"outline"}>
+            Sign In
+          </Button>
         </form>
       </Form>
     </>

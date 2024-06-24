@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { NextResponse } from "next/server"
 
 export async function signIn(login: string, password: string) {
@@ -23,5 +24,5 @@ export async function signIn(login: string, password: string) {
 
   cookies().set("token", data.token)
 
-  return NextResponse.json(data)
+  return redirect("/")
 }

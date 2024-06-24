@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 
 export function middleware(req: NextRequest) {
+  const token = req.cookies.get("token")?.value
   console.log(req.nextUrl.pathname)
-  console.log(req.cookies.get("token")?.value)
-  if (
-    !req.cookies.get("token")?.value &&
-    req.nextUrl.pathname.startsWith("/chat")
-  ) {
-    console.log("redirecting")
-    return NextResponse.redirect(new URL("/", req.url))
-  }
+
+  if (!token && !req.nextUrl.pathname.startsWith("/auth/login"))
+    return NextResponse.redirect(new URL("/auth/login", req.url))
 }
 
 export const config = {

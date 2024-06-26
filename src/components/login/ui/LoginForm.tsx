@@ -46,7 +46,7 @@ export default function LoginForm() {
               <FormItem>
                 <FormLabel>Login</FormLabel>
                 <FormControl>
-                  <Input placeholder='Login...' {...field} />
+                  <Input placeholder='Login' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

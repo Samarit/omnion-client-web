@@ -11,7 +11,6 @@ const sendSocketMessage = (socket: Socket, message: string) => {
     console.log("no socket to send")
     return
   }
-  console.log("message to send", message)
   socket.emit("message", message)
 }
 
@@ -44,12 +43,7 @@ export default function Chat() {
         console.log("no socket in handler")
         return
       }
-      if (e.key === "Enter") {
-        sendSocketMessage(socket, messageToSend)
-        setPendingResponse(true)
-        console.log("messageToSend", messageToSend)
-        setMessageToSend("")
-      }
+      if (e.key === "Enter") submitMessage()
     }
 
     window.addEventListener("keydown", enterHandler)
@@ -104,6 +98,21 @@ export default function Chat() {
     }
   }, [socket])
 
+  const submitMessage = () => {
+    if (!messageToSend || !socket) return
+
+    setChatHistory((prev) => [
+      ...prev,
+      {
+        text: messageToSend,
+        position: "right",
+      },
+    ])
+    sendSocketMessage(socket, messageToSend)
+    setPendingResponse(true)
+    setMessageToSend("")
+  }
+
   return (
     <div className='chat'>
       <h3>{connected ? "connected!" : "connecting..."}</h3>
@@ -130,15 +139,7 @@ export default function Chat() {
         placeholder='Enter message...'
       />
 
-      <Button
-        variant={"outline"}
-        onClick={() => {
-          if (!messageToSend || !socket) return
-
-          sendSocketMessage(socket, messageToSend)
-          setPendingResponse(true)
-          setMessageToSend("")
-        }}>
+      <Button variant={"outline"} onClick={() => submitMessage()}>
         Send
       </Button>
     </div>

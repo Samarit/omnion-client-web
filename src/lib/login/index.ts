@@ -3,8 +3,7 @@ import { redirect } from "next/navigation"
 import { NextResponse } from "next/server"
 
 export async function signIn(login: string, password: string) {
-  console.log("login", login, "password", password)
-  console.log(JSON.stringify({ login, password }))
+  console.log({ user: { login, password } })
   const response = await fetch("http://localhost:5000/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

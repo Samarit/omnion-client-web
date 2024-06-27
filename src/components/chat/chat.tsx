@@ -25,8 +25,8 @@ export default function Chat() {
   const [messageToSend, setMessageToSend] = useState("")
   const [chatHistory, setChatHistory] = useState<IMessage[]>([])
   const [pendingResponse, setPendingResponse] = useState(false)
-  const [draftingResponse, setDraftingResponse] = useState<string>("")
-  const draftingResponseRef = useRef(draftingResponse)
+  const [draftingResponse, setDraftingResponse] = useState<string | null>("")
+  const draftingResponseRef = useRef(draftingResponse) // Ref for current socket response chunks
 
   useEffect(() => {
     setSocket(
@@ -45,7 +45,6 @@ export default function Chat() {
       }
       if (e.key === "Enter") submitMessage()
     }
-
     window.addEventListener("keydown", enterHandler)
 
     return () => {
@@ -58,24 +57,25 @@ export default function Chat() {
 
     socket.on("connect", () => {
       console.log("socket connected")
-
       setConnected(true)
     })
 
     socket.on("response:start", () => {
       console.log("response:start")
       setPendingResponse(false)
+      setDraftingResponse("")
     })
 
     socket.on("response:chunk", (chunk: string) => {
       console.log("response:chunk")
-      setDraftingResponse(draftingResponseRef.current + chunk)
-      draftingResponseRef.current += chunk
+      const prev = draftingResponseRef.current ?? ""
+      setDraftingResponse(prev + chunk)
+      draftingResponseRef.current = prev + chunk
     })
 
     socket.on("response:end", () => {
       console.log("response:end")
-      const response = draftingResponseRef.current
+      const response = draftingResponseRef.current ?? ""
       setChatHistory((prev) => [
         ...prev,
         {
@@ -84,8 +84,8 @@ export default function Chat() {
         },
       ])
 
-      setDraftingResponse("")
-      draftingResponseRef.current = ""
+      setDraftingResponse(null)
+      draftingResponseRef.current = null
     })
 
     socket.on("disconnect", () => {
@@ -122,10 +122,10 @@ export default function Chat() {
           <ChatBox position={msg.position} message={msg.text} key={i}></ChatBox>
         ))}
 
-        {(pendingResponse || draftingResponse) && (
+        {(pendingResponse || draftingResponse || draftingResponse === "") && (
           <ChatBox
             position={"left"}
-            message={draftingResponse}
+            message={draftingResponse ?? ""}
             pending={pendingResponse}
           />
         )}

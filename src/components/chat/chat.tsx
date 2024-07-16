@@ -25,8 +25,8 @@ export default function Chat() {
   const [messageToSend, setMessageToSend] = useState("")
   const [chatHistory, setChatHistory] = useState<IMessage[]>([])
   const [pendingResponse, setPendingResponse] = useState(false)
-  const [draftingResponse, setDraftingResponse] = useState<string | null>("")
-  const draftingResponseRef = useRef(draftingResponse) // Ref for current socket response chunks
+  const [draftingResponse, setDraftingResponse] = useState<string | null>(null)
+  const draftingResponseRef = useRef(draftingResponse)
 
   useEffect(() => {
     setSocket(
@@ -60,6 +60,16 @@ export default function Chat() {
       setConnected(true)
     })
 
+    socket.on("message", (message: string) => {
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          text: message,
+          position: "left",
+        },
+      ])
+    })
+
     socket.on("response:start", () => {
       console.log("response:start")
       setPendingResponse(false)
@@ -75,7 +85,8 @@ export default function Chat() {
 
     socket.on("response:end", () => {
       console.log("response:end")
-      const response = draftingResponseRef.current ?? ""
+      const response = draftingResponseRef.current
+      if (!response) return
       setChatHistory((prev) => [
         ...prev,
         {
@@ -125,8 +136,9 @@ export default function Chat() {
         {(pendingResponse || draftingResponse || draftingResponse === "") && (
           <ChatBox
             position={"left"}
-            message={draftingResponse ?? ""}
+            message={draftingResponse ?? "..."}
             pending={pendingResponse}
+            test={[pendingResponse, draftingResponse]}
           />
         )}
       </ul>

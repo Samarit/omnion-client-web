@@ -25,7 +25,7 @@ export default function Chat() {
   const [messageToSend, setMessageToSend] = useState("")
   const [chatHistory, setChatHistory] = useState<IMessage[]>([])
   const [pendingResponse, setPendingResponse] = useState(false)
-  const [draftingResponse, setDraftingResponse] = useState<string>("")
+  const [draftingResponse, setDraftingResponse] = useState<string | null>(null)
   const draftingResponseRef = useRef(draftingResponse)
 
   useEffect(() => {
@@ -62,20 +62,33 @@ export default function Chat() {
       setConnected(true)
     })
 
+    socket.on("message", (message: string) => {
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          text: message,
+          position: "left",
+        },
+      ])
+    })
+
     socket.on("response:start", () => {
       console.log("response:start")
       setPendingResponse(false)
+      setDraftingResponse("")
     })
 
     socket.on("response:chunk", (chunk: string) => {
       console.log("response:chunk")
-      setDraftingResponse(draftingResponseRef.current + chunk)
-      draftingResponseRef.current += chunk
+      const prev = draftingResponseRef.current ?? ""
+      setDraftingResponse(prev + chunk)
+      draftingResponseRef.current = prev + chunk
     })
 
     socket.on("response:end", () => {
       console.log("response:end")
       const response = draftingResponseRef.current
+      if (!response) return
       setChatHistory((prev) => [
         ...prev,
         {
@@ -84,8 +97,8 @@ export default function Chat() {
         },
       ])
 
-      setDraftingResponse("")
-      draftingResponseRef.current = ""
+      setDraftingResponse(null)
+      draftingResponseRef.current = null
     })
 
     socket.on("disconnect", () => {
@@ -122,11 +135,12 @@ export default function Chat() {
           <ChatBox position={msg.position} message={msg.text} key={i}></ChatBox>
         ))}
 
-        {(pendingResponse || draftingResponse) && (
+        {(pendingResponse || draftingResponse || draftingResponse === "") && (
           <ChatBox
             position={"left"}
-            message={draftingResponse}
+            message={draftingResponse ?? "..."}
             pending={pendingResponse}
+            test={[pendingResponse, draftingResponse]}
           />
         )}
       </ul>

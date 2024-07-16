@@ -45,7 +45,6 @@ export default function Chat() {
       }
       if (e.key === "Enter") submitMessage()
     }
-
     window.addEventListener("keydown", enterHandler)
 
     return () => {
@@ -58,7 +57,6 @@ export default function Chat() {
 
     socket.on("connect", () => {
       console.log("socket connected")
-
       setConnected(true)
     })
 

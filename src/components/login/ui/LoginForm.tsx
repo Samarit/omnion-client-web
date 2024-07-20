@@ -17,11 +17,11 @@ import { submitLogin } from "./actions"
 import { Button } from "@/shared/ui/button"
 
 const schema = z.object({
-  login: z.string().trim().min(5, "Login must be at least 5 characters long"),
+  login: z.string().trim().min(3, "Login must be at least 3 characters long"),
   password: z
     .string()
     .trim()
-    .min(5, "Password must be at least 5 characters long"),
+    .min(3, "Password must be at least 3 characters long"),
 })
 
 export default function LoginForm() {

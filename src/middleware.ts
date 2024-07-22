@@ -4,7 +4,7 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value
   console.log(req.nextUrl.pathname)
 
-  if (!token && !req.nextUrl.pathname.startsWith("/login"))
+  if (!token && !["/login", "/register"].includes(req.nextUrl.pathname))
     return NextResponse.redirect(new URL("/login", req.url))
 }
 

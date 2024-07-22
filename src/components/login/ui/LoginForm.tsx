@@ -33,12 +33,16 @@ export default function LoginForm() {
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
     const { login, password } = values
-    await submitLogin(login, password)
+    const res = await submitLogin(login, password)
+    if (res.error) form.setError("root", { type: "400", message: res.error })
   }
 
   return (
     <>
       <Form {...form}>
+        {form.formState.errors.root?.message && (
+          <span>{form.formState.errors.root?.message}</span>
+        )}
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <FormField
             name='login'
@@ -59,7 +63,12 @@ export default function LoginForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder='Password' type='password' {...field} />
+                  <Input
+                    placeholder='Password'
+                    type='password'
+                    {...field}
+                    hidden={false}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

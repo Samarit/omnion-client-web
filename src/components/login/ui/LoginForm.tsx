@@ -34,7 +34,7 @@ export default function LoginForm() {
   const onSubmit = async (values: z.infer<typeof schema>) => {
     const { login, password } = values
     const res = await submitLogin(login, password)
-    if (res.error) form.setError("root", { type: "400", message: res.error })
+    if (res && res.error) form.setError("root", { message: res.error })
   }
 
   return (

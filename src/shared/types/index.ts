@@ -1,8 +1,6 @@
-export interface ApiResponse {
+export interface ApiResponse<T> {
+  success: string
   status: number
-  message: string
-}
-
-export interface AuthResponse extends ApiResponse {
-  token: string
+  message: string | null
+  data: T | null
 }

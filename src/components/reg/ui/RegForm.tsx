@@ -45,11 +45,16 @@ export default function RegForm() {
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
     const { login, password } = values
-    await submitReg(login, password)
+    const err = await submitReg(login, password)
+    if (err) form.setError("root", { message: err })
   }
 
   return (
     <Form {...form}>
+      {form.formState.errors.root?.message && (
+        <span>{form.formState.errors.root?.message}</span>
+      )}
+
       <form
         onSubmit={form.handleSubmit((values) => {
           onSubmit(values)

@@ -13,8 +13,9 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Input } from "@/shared/ui/input"
-import { submitLogin } from "./actions"
+import { submitLogin } from "../actions"
 import { Button } from "@/shared/ui/button"
+import { useFormState } from "react-dom"
 
 const schema = z.object({
   login: z.string().trim().min(3, "Login must be at least 3 characters long"),
@@ -32,13 +33,16 @@ export default function LoginForm() {
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
     const { login, password } = values
-
-    await submitLogin(login, password)
+    const res = await submitLogin(login, password)
+    if (res && res.error) form.setError("root", { message: res.error })
   }
 
   return (
     <>
       <Form {...form}>
+        {form.formState.errors.root?.message && (
+          <span>{form.formState.errors.root?.message}</span>
+        )}
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <FormField
             name='login'
@@ -59,7 +63,12 @@ export default function LoginForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder='Password' type='password' {...field} />
+                  <Input
+                    placeholder='Password'
+                    type='password'
+                    {...field}
+                    hidden={false}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
